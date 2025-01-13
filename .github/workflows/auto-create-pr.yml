@@ -17,6 +17,8 @@ jobs:
       uses: actions/github-script@v6
       with:
         gh-version: 'latest'
+        script: |
+          # Your GitHub CLI script here
 
     - name: Create Pull Request
       env:
