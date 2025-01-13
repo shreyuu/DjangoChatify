@@ -1,0 +1,39 @@
+name: Auto Create PR
+
+on:
+  push:
+    branches:
+      - '**'  # Trigger this workflow on pushes to any branch
+
+jobs:
+  create-pr:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout the code
+      uses: actions/checkout@v3
+
+    - name: Set up GitHub CLI
+      uses: cli/cli-action@v2
+      with:
+        gh-version: 'latest'
+
+    - name: Create Pull Request
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        # Get the current branch name
+        BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD)
+        
+        # Define the base branch (e.g., main)
+        BASE_BRANCH="main"
+        
+        # Check if a PR already exists for the branch
+        PR_EXISTS=$(gh pr list --head "$BRANCH_NAME" --state open -L 1 | wc -l)
+        
+        if [ "$PR_EXISTS" -eq 0 ]; then
+          # Create a new pull request if one does not exist
+          gh pr create --head "$BRANCH_NAME" --base "$BASE_BRANCH" --title "Automated PR from $BRANCH_NAME" --body "This PR was automatically created from the branch $BRANCH_NAME."
+        else
+          echo "A PR already exists for this branch."
+        fi
