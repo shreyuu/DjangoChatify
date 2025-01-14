@@ -60,67 +60,68 @@ cd djangochatify
 
 3.	**Run the MongoDB service**:
     - Ensure MongoDB is running locally or use a cloud-based service like MongoDB Atlas.
-4.	Set up Redis:
+
+4.	**Set up Redis**:
     - Install Redis via Homebrew:
         ````
         brew install redis
         brew services start redis
         ````
 
-5.	Run database migrations:
+5.	**Run database migrations**:
     ```
     python manage.py migrate
     ```
 
-6.	Start the Django server:
+6.	**Start the Django server**:
     ```
     python manage.py runserver
     ```
 
 ### Windows
-1.	Set up a virtual environment:
+1.	**Set up a virtual environment**:
     ```
     python -m venv env
     env\Scripts\activate
     ```
 
-2.	Install dependencies:
+2.	**Install dependencies**:
     ```
     pip install -r requirements.txt
     ```
 
-3.	Run the MongoDB service:
+3.	**Run the MongoDB service**:
     - Ensure MongoDB is running locally or use a cloud-based service like MongoDB Atlas.
-4.	Set up Redis:
+4.	**Set up Redis**:
     - Download Redis for Windows from Microsoft’s GitHub repository.
     - Start the Redis server:
         ```
         redis-server
         ```
 
-5.	Run database migrations:
+5.	**Run database migrations**:
     ```
     python manage.py migrate
     ```
 
-6.	Start the Django server:
+6.	**Start the Django server**:
     ```
     python manage.py runserver
     ```
 ### Frontend Setup (React.js)
 
 macOS & Windows
-1.	Navigate to the frontend directory:
+1.	**Navigate to the frontend directory**:
     ```
     cd frontend
     ```
 
-2.	Install dependencies:
+2.	**Install dependencies**:
     ```
     npm install
     ```
 
-3.	Start the React development server:
+3.	**Start the React development server**:
     ```
     npm start
     ```
@@ -156,4 +157,4 @@ This project is licensed under the MIT License.
 
 ## Author
 
-Developed by Shreyash Meshram. Feel free to connect or contribute!
+Developed by [Shreyash Meshram](https://github.com/shreyuu). Feel free to connect or contribute!
