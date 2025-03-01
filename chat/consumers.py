@@ -1,83 +1,66 @@
 import json
+import logging
 from channels.generic.websocket import AsyncWebsocketConsumer
+from datetime import datetime
+
+logger = logging.getLogger(__name__)
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        # Get the room name from the URL route
-        self.room_name = self.scope['url_route']['kwargs']['room_name']
+        self.room_name = self.scope["url_route"]["kwargs"]["room_name"]
         self.room_group_name = f"chat_{self.room_name}"
-
-        # Join the room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
+        await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
-        print(f"WebSocket connected successfully to: {self.room_group_name}")
+        print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] New connection in room: {self.room_name}")
 
     async def disconnect(self, close_code):
-        # Leave the room group
-        await self.channel_layer.group_discard(
-            self.room_group_name,
-            self.channel_name
-        )
+        print(f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Connection closed in room: {self.room_name}")
+        await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
-    async def websocket_receive(self, event):
-        """
-        Override websocket_receive to properly handle incoming messages
-        """
-        print(f"Received event: {event}")  # Debugging to check the structure of event
-
-        # Check if event is a string (which could be the raw message)
-        if isinstance(event, str):
-            message = event
-        elif isinstance(event, dict):
-            # If it's a dictionary, we expect a 'text' key with the actual message
-            message = event.get('text', None)
-        else:
-            # If event is not a string or dictionary, return early
-            print(f"Unexpected event type: {type(event)}")
-            return
-
-        # If message is None or empty, return early
-        if not message:
-            print("No message found in event.")
-            return
-
+    async def receive(self, text_data):
         try:
-            # Try to load the message as JSON if it's in string format
-            if isinstance(message, str):
-                data = json.loads(message)
+            # Handle double-encoded JSON
+            text_data_json = json.loads(text_data)
+            if isinstance(text_data_json, str):
+                message_data = json.loads(text_data_json)
             else:
-                data = message
+                message_data = text_data_json
 
-            # Forward the message to the room group
+            # Print debug information for received message
+            print("\n=== Message Received From Client ===")
+            print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"Room: {self.room_name}")
+            print(f"From User: {message_data['userId']}")
+            print(f"Message: {message_data['message']}")
+            print("Broadcasting to group members...")
+            print("========================\n")
+
+            # Broadcasting to group
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
                     'type': 'chat_message',
-                    'message': data.get('message', ''),
-                    'userId': data.get('userId', ''),
-                    'timestamp': data.get('timestamp', '')
+                    'message': message_data['message'],
+                    'userId': message_data['userId'],
+                    'timestamp': message_data['timestamp'],
+                    'sender_channel': self.channel_name  # Add sender channel name
                 }
             )
         except json.JSONDecodeError as e:
-            # Handle JSON decode errors
-            print(f"JSON decode error: {e}")
-            await self.send(text_data=json.dumps({
-                'error': 'Invalid message format'
-            }))
+            print(f"Error decoding JSON: {e}")
         except Exception as e:
-            # General error handler
-            print(f"An unexpected error occurred: {e}")
-            await self.send(text_data=json.dumps({
-                'error': 'An unexpected error occurred'
-            }))
+            print(f"Unexpected error: {e}")
 
     async def chat_message(self, event):
-        """
-        Send the message to WebSocket
-        """
+        # Only log broadcasting details
+        if event.get('sender_channel') != self.channel_name:
+            print(f"\n=== Broadcasting Message to Client ===")
+            print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            print(f"To Channel: {self.channel_name}")
+            print(f"Message: {event['message']}")
+            print("========================\n")
+        
+        # Send message to WebSocket
         await self.send(text_data=json.dumps({
             'message': event['message'],
             'userId': event['userId'],
