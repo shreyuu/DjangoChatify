@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef, useCallback } from 'react';
+import { useState, useEffect, useRef, useCallback } from "react";
 
 const useWebSocket = (url, options = {}) => {
     const [isConnected, setIsConnected] = useState(false);
     const [error, setError] = useState(null);
+    const [lastMessage, setLastMessage] = useState(null);
     const wsRef = useRef(null);
     const reconnectAttempts = useRef(0);
     const maxReconnectAttempts = options.maxAttempts || 5;
@@ -13,35 +14,37 @@ const useWebSocket = (url, options = {}) => {
             wsRef.current = new WebSocket(url);
 
             wsRef.current.onopen = () => {
-                console.log('WebSocket Connected');
+                console.log("WebSocket Connected");
                 setIsConnected(true);
                 setError(null);
                 reconnectAttempts.current = 0;
             };
 
             wsRef.current.onclose = (event) => {
-                console.log('WebSocket Disconnected:', event.code);
+                console.log("WebSocket Disconnected:", event.code);
                 setIsConnected(false);
 
                 if (reconnectAttempts.current < maxReconnectAttempts) {
-                    const delay = Math.min(baseDelay * Math.pow(2, reconnectAttempts.current), 30000);
+                    const delay = Math.min(
+                        baseDelay * Math.pow(2, reconnectAttempts.current),
+                        30000
+                    );
                     console.log(`Reconnecting in ${delay}ms...`);
                     setTimeout(() => {
                         reconnectAttempts.current += 1;
                         connect();
                     }, delay);
                 } else {
-                    setError('Maximum reconnection attempts reached');
+                    setError("Maximum reconnection attempts reached");
                 }
             };
 
             wsRef.current.onerror = (error) => {
-                console.error('WebSocket Error:', error);
-                setError('Connection error occurred');
+                console.error("WebSocket Error:", error);
+                setError("Connection error occurred");
             };
-
         } catch (err) {
-            console.error('WebSocket Connection Error:', err);
+            console.error("WebSocket Connection Error:", err);
             setError(err.message);
         }
     }, [url, maxReconnectAttempts, baseDelay]);
@@ -55,11 +58,21 @@ const useWebSocket = (url, options = {}) => {
         };
     }, [connect]);
 
+    useEffect(() => {
+        if (wsRef.current) {
+            wsRef.current.onmessage = (event) => {
+                console.log('%cWebSocket Message Received:', 'color: #4CAF50; font-weight: bold');
+                console.log('Data:', JSON.parse(event.data));
+                setLastMessage(event);
+            };
+        }
+    }, [wsRef]);
+
     const sendMessage = useCallback((message) => {
         if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
             wsRef.current.send(JSON.stringify(message));
         } else {
-            console.error('WebSocket is not connected');
+            console.error("WebSocket is not connected");
         }
     }, []);
 
@@ -67,7 +80,8 @@ const useWebSocket = (url, options = {}) => {
         isConnected,
         error,
         sendMessage,
-        reconnect: connect
+        reconnect: connect,
+        lastMessage,
     };
 };
 
