@@ -12,8 +12,16 @@ services:
       - .env
     depends_on:
       - redis
+    networks:
+      - djangochatify_network
 
   redis:
     image: redis:alpine
     ports:
       - "6379:6379"
+    networks:
+      - djangochatify_network
+
+networks:
+  djangochatify_network:
+    driver: bridge

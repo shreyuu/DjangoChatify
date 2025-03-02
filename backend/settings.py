@@ -104,14 +104,12 @@ else:
 
 # Channels and Redis settings
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            'hosts': [os.getenv('REDIS_URL', 'redis://localhost:6379')],
-            'capacity': 1500,  # Channel capacity
-            'expiry': 10,      # Message expiry in seconds
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("redis", 6379)],
         },
-    }
+    },
 }
 
 # CORS Configuration
