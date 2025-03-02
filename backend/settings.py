@@ -14,6 +14,7 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 import sys
+from datetime import timedelta
 
 # Load environment variables from .env file
 load_dotenv()
@@ -46,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chat.apps.ChatConfig',  # Use the specific app config instead of just 'chat'
     'corsheaders',
+    'rest_framework',
 ]
 
 MIDDLEWARE = [
@@ -103,7 +105,12 @@ else:
 # Channels and Redis settings
 CHANNEL_LAYERS = {
     'default': {
-        'BACKEND': 'channels.layers.InMemoryChannelLayer'
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [os.getenv('REDIS_URL', 'redis://localhost:6379')],
+            'capacity': 1500,  # Channel capacity
+            'expiry': 10,      # Message expiry in seconds
+        },
     }
 }
 
@@ -161,3 +168,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Add message persistence
+MESSAGE_RETENTION_DAYS = 30
+MESSAGE_BATCH_SIZE = 50
