@@ -1,9 +1,10 @@
-FROM node:16-alpine as frontend
-WORKDIR /app/frontend
-COPY frontend/package*.json ./
+FROM node:16-alpine
+WORKDIR /app
+COPY package*.json ./
 RUN npm install
-COPY frontend/ ./
-RUN npm run build
+COPY . .
+EXPOSE 3000
+CMD ["npm", "start"]
 
 FROM python:3.9-slim
 WORKDIR /app
