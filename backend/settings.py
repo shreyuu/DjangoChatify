@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'chat.apps.ChatConfig',  # Use the specific app config instead of just 'chat'
     'corsheaders',
-    'rest_framework',
+    'rest_framework',  # Make sure this is included
 ]
 
 MIDDLEWARE = [
@@ -172,3 +172,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Add message persistence
 MESSAGE_RETENTION_DAYS = 30
 MESSAGE_BATCH_SIZE = 50
+
+# Add REST Framework settings
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
