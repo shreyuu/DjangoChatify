@@ -15,6 +15,8 @@ from pathlib import Path
 from dotenv import load_dotenv
 import sys
 from datetime import timedelta
+import dj_database_url
+
 
 # Load environment variables from .env file
 load_dotenv()
@@ -33,6 +35,9 @@ DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
 
+# Parse DATABASE_URL from .env file
+DATABASES = {}
+DATABASES['default'] = dj_database_url.config(default=os.getenv('DATABASE_URL'))
 
 # Application definition
 
