@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 from channels.testing import WebsocketCommunicator
 from channels.routing import URLRouter
 from chat.routing import websocket_urlpatterns
+from channels.layers import get_channel_layer
+from django.urls import re_path
+from chat.consumers import ChatConsumer
 
 class HelloWorldTest(TestCase):
     def test_hello_world(self):
@@ -22,9 +25,14 @@ class ChatTests(TestCase):
 
 class WebSocketTests(TestCase):
     async def test_websocket_connection(self):
-        communicator = WebsocketCommunicator(
-            URLRouter(websocket_urlpatterns),
-            "/ws/chat/testroom/"
-        )
-        connected, _ = await communicator.connect()
+        application = URLRouter([
+            re_path(r'ws/chat/(?P<room_name>\w+)/$', ChatConsumer.as_asgi()),
+        ])
+        communicator = WebsocketCommunicator(application, "ws/chat/testroom/")
+        
+        # Increase timeout if needed
+        connected, _ = await communicator.connect(timeout=2)
         self.assertTrue(connected)
+        
+        # Clean up
+        await communicator.disconnect()
