@@ -85,7 +85,7 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'backend.wsgi.application'
-ASGI_APPLICATION = 'backend.asgi.application'
+ASGI_APPLICATION = 'chat.routing.application'
 
 # Database Configuration (PostgreSQL)
 if 'test' in sys.argv:
