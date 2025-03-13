@@ -26,9 +26,8 @@ class ChatTests(TestCase):
         """Test that we can create a user"""
         self.assertEqual(self.user.username, 'testuser')
 
-class WebSocketTests(TestCase):
     async def test_websocket_connection(self):
-        communicator = WebsocketCommunicator(application, "/ws/chat/")
-        connected, subprotocol = await communicator.connect(timeout=10)  # Increased timeout to 10 seconds
+        communicator = WebsocketCommunicator(application, "/ws/chat/testroom/")
+        connected, _ = await communicator.connect()
         self.assertTrue(connected)
         await communicator.disconnect()
