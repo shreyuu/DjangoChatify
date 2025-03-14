@@ -109,13 +109,16 @@ else:
 
 # Channels and Redis settings
 CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "channels_redis.core.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],  
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
         },
     },
 }
+
+# For testing
+PYTEST_DJANGO_TEST_RUNNER = "pytest_django.runner.pytest_runner"
 
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
