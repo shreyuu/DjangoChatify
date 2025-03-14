@@ -8,7 +8,7 @@ channels-redis>=4.1.0
 constantly==23.10.4
 cryptography==42.0.5
 daphne==4.0.0
-django>=4.2
+Django>=4.2
 django-cors-headers==4.3.1
 djangorestframework==3.14.0
 dnspython==2.7.0
@@ -25,7 +25,7 @@ pymongo==3.12.3
 pyOpenSSL==25.0.0
 python-dotenv==1.0.0
 pytz==2024.2
-redis==5.0.1
+redis>=4.0.0
 service-identity==24.2.0
 setuptools==75.8.0
 sqlparse==0.4.4

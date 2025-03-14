@@ -9,6 +9,7 @@ from chat.consumers import ChatConsumer
 from channels.testing import WebsocketCommunicator
 from django.test import TestCase
 from .routing import application
+import pytest
 
 class HelloWorldTest(TestCase):
     def test_hello_world(self):
@@ -26,8 +27,13 @@ class ChatTests(TestCase):
         """Test that we can create a user"""
         self.assertEqual(self.user.username, 'testuser')
 
+    @pytest.mark.asyncio
+    @pytest.mark.django_db(transaction=True)
     async def test_websocket_connection(self):
-        communicator = WebsocketCommunicator(application, "/ws/chat/testroom/")
-        connected, _ = await communicator.connect()
-        self.assertTrue(connected)
-        await communicator.disconnect()
+        try:
+            communicator = WebsocketCommunicator(application, "/ws/chat/testroom/")
+            connected, _ = await communicator.connect()
+            self.assertTrue(connected)
+            await communicator.disconnect()
+        except Exception as e:
+            self.fail(f"Test failed with exception: {str(e)}")
