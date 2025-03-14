@@ -117,6 +117,9 @@ CHANNEL_LAYERS = {
     },
 }
 
+# For testing
+PYTEST_DJANGO_TEST_RUNNER = "pytest_django.runner.pytest_runner"
+
 # CORS Configuration
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
