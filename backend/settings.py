@@ -117,6 +117,9 @@ CHANNEL_LAYERS = {
     },
 }
 
+# Testing configurations
+TEST_RUNNER = "django.test.runner.DiscoverRunner"
+
 # For testing
 PYTEST_DJANGO_TEST_RUNNER = "pytest_django.runner.pytest_runner"
 
