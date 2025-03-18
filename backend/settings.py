@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 import sys
 from datetime import timedelta
 import dj_database_url
+from django.core.exceptions import ImproperlyConfigured
 
 
 # Load environment variables from .env file
@@ -34,10 +35,6 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
-
-# Parse DATABASE_URL from .env file
-DATABASES = {}
-DATABASES['default'] = dj_database_url.config(default=os.getenv('DATABASE_URL'))
 
 # Application definition
 
@@ -87,12 +84,15 @@ TEMPLATES = [
 WSGI_APPLICATION = 'backend.wsgi.application'
 ASGI_APPLICATION = 'chat.routing.application'
 
-# Database Configuration (PostgreSQL)
+# Database Configuration
 if 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'test_db.sqlite3',
+            'NAME': str(BASE_DIR / 'test_db.sqlite3'),  # Convert Path to string
+            'TEST': {
+                'NAME': str(BASE_DIR / 'test_db.sqlite3'),
+            },
         }
     }
 else:
@@ -102,7 +102,7 @@ else:
             'NAME': os.getenv('DB_NAME'),
             'USER': os.getenv('DB_USER'),
             'PASSWORD': os.getenv('DB_PASSWORD'),
-            'HOST': 'localhost',
+            'HOST': os.getenv('DB_HOST'),
             'PORT': os.getenv('DB_PORT'),
         }
     }
