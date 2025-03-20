@@ -89,7 +89,7 @@ if 'test' in sys.argv:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': str(BASE_DIR / 'test_db.sqlite3'),  # Convert Path to string
+            'NAME': str(BASE_DIR / 'test_db.sqlite3'),
             'TEST': {
                 'NAME': str(BASE_DIR / 'test_db.sqlite3'),
             },
