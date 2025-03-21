@@ -28,6 +28,19 @@ jobs:
         image: mongo
         ports:
           - 27017:27017
+      postgres:
+        image: postgres:14
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: mydatabase
 
     steps:
       - uses: actions/checkout@v4
@@ -43,5 +56,6 @@ jobs:
       - name: Run Tests
         env:
           DJANGO_SETTINGS_MODULE: backend.settings
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mydatabase # Add PostgreSQL URL
         run: |
           pytest chat/tests.py -v
