@@ -84,36 +84,23 @@ if 'test' in sys.argv:
         }
     }
 else:
-    # Check if DATABASE_URL is provided in the environment (e.g., GitHub Actions or production)
-    database_url = os.getenv('DATABASE_URL')
-
-    if database_url:
-        # If DATABASE_URL exists, use it to configure the database
-        DATABASES = {
-            'default': dj_database_url.config(default=database_url)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('POSTGRES_DB', 'djangochatify_db'),
+            'USER': os.getenv('POSTGRES_USER', 'postgres'),
+            'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'shreyuu'),
+            'HOST': os.getenv('POSTGRES_HOST', 'db'),
+            'PORT': os.getenv('POSTGRES_PORT', '5432'),
         }
-    else:
-        # Otherwise, fall back to the individual DB_* variables
-        DATABASES = {
-            'default': {
-                'ENGINE': 'django.db.backends.postgresql',
-                'NAME': os.getenv('DB_NAME'),
-                'USER': os.getenv('DB_USER'),
-                'PASSWORD': os.getenv('DB_PASSWORD'),
-                'HOST': os.getenv('DB_HOST'),
-                'PORT': os.getenv('DB_PORT'),
-                'TEST': {
-                    'NAME': 'test_' + os.getenv('DB_NAME', 'djangochatify_db'),
-                },
-            }
-        }
+    }
 
 # Channels and Redis settings
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer',
         'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+            "hosts": [('redis', 6379)],
         },
     },
 }

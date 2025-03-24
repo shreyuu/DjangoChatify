@@ -1,16 +1,28 @@
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: >
+      sh -c "while ! nc -z db 5432; do
+              echo 'Waiting for database...';
+              sleep 1;
+            done;
+            python manage.py migrate &&
+            python manage.py runserver 0.0.0.0:8000"
     volumes:
       - .:/code
     ports:
       - "8000:8000"
     depends_on:
-      - db
-      - redis
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
     environment:
-      - DATABASE_URL=postgresql://postgres:postgres@db:5432/djangochatify
+      - DATABASE_URL=postgresql://postgres:shreyuu@db:5432/djangochatify_db
+      - DJANGO_SETTINGS_MODULE=backend.settings
+      - SECRET_KEY=${SECRET_KEY}
+      - DEBUG=${DEBUG}
+      - ALLOWED_HOSTS=${ALLOWED_HOSTS}
 
   redis:
     image: redis:7
@@ -22,11 +34,16 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
     environment:
-      - POSTGRES_DB=djangochatify
+      - POSTGRES_DB=djangochatify_db
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_PASSWORD=shreyuu
     ports:
       - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres_data:
