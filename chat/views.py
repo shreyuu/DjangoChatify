@@ -3,7 +3,7 @@ from django.core.cache import cache
 from django.db import connections
 from django.db.utils import OperationalError
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404
 from django_ratelimit.decorators import ratelimit
 from redis import Redis
 from rest_framework import status, viewsets

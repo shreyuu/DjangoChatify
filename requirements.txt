@@ -1,6 +1,6 @@
 # Django and Django-related packages
-Django>=4.2
-djangorestframework==3.14.0
+Django>=4.2.20
+djangorestframework>=3.15.2
 django-cors-headers==4.3.1
 dj-database-url==1.0.0
 
@@ -11,33 +11,33 @@ daphne==4.0.0
 asgiref==3.7.2
 
 # Production server
-gunicorn==21.2.0
+gunicorn>=23.0.0
 
 # Database drivers
-psycopg2-binary==2.9.9
-pymongo==3.12.3
+psycopg>=3.1.18
 redis>=4.0.0
 
 # Cryptography and security
-cryptography==42.0.5
+cryptography>=44.0.1
 pyOpenSSL==25.0.0
 pyasn1==0.6.1
 pyasn1_modules==0.4.1
 service-identity==24.2.0
+PyJWT>=2.10.1
 
 # Utilities
 python-dotenv==1.0.0
 setuptools==75.8.0
 msgpack==1.1.0
 pytz==2024.2
-sqlparse==0.4.4
+sqlparse>=0.5.0
 typing_extensions==4.12.2
 
 # WebSocket dependencies
 autobahn==23.1.2
 Automat==24.8.1
 txaio==23.1.1
-Twisted[tls]==23.10.0
+Twisted[tls]>=24.7.0rc1
 constantly==23.10.4
 hyperlink==21.0.0
 idna==3.10
@@ -56,11 +56,11 @@ attrs==24.3.0
 drf-spectacular==0.27.1
 
 # Security
-djangorestframework-simplejwt==5.3.1
+djangorestframework-simplejwt>=5.5.1
 django-ratelimit==4.1.0
 
 # Monitoring and Logging
-sentry-sdk==1.40.6
+sentry-sdk>=2.8.0
 python-json-logger==2.0.7
 
 # Performance and Caching

@@ -1,10 +1,7 @@
 import os
 import sys
-from datetime import timedelta
 from pathlib import Path
 
-import dj_database_url
-from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
 
 # Load environment variables from .env file
@@ -199,7 +196,7 @@ SPECTACULAR_SETTINGS = {
 if not DEBUG and os.getenv("SENTRY_DSN"):
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
-    
+
     sentry_sdk.init(
         dsn=os.getenv("SENTRY_DSN"),
         integrations=[DjangoIntegration()],

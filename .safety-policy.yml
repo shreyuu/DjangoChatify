@@ -1,0 +1,13 @@
+security:
+  ignore-vulnerabilities:
+    # djangorestframework-simplejwt: Information disclosure vulnerability (CVE-2024-22513)
+    # Waiting for version 5.5.1 to be released
+    - id: 66963
+      reason: "Waiting for djangorestframework-simplejwt 5.5.1 to be released"
+      expires: "2024-06-01"
+
+    # pyjwt: Partial Comparison vulnerability (CVE-2024-53861)
+    # Fixed in PyJWT 2.10.1
+    - id: 74429
+      reason: "Fixed in PyJWT 2.10.1, which is now installed"
+      expires: "2024-06-01"
