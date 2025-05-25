@@ -15,41 +15,85 @@ class Migration(migrations.Migration):
 
     operations = [
         migrations.CreateModel(
-            name='ChatRoom',
+            name="ChatRoom",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=100)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('is_active', models.BooleanField(default=True)),
-                ('participants', models.ManyToManyField(related_name='chat_rooms', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=100)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("is_active", models.BooleanField(default=True)),
+                (
+                    "participants",
+                    models.ManyToManyField(
+                        related_name="chat_rooms", to=settings.AUTH_USER_MODEL
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Message',
+            name="Message",
             fields=[
-                ('id', models.BigAutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('content', models.TextField()),
-                ('timestamp', models.DateTimeField(auto_now_add=True)),
-                ('is_read', models.BooleanField(default=False)),
-                ('attachment', models.FileField(blank=True, null=True, upload_to='chat_attachments/')),
-                ('room', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='djangochatify_chat.chatroom')),
-                ('sender', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigAutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("content", models.TextField()),
+                ("timestamp", models.DateTimeField(auto_now_add=True)),
+                ("is_read", models.BooleanField(default=False)),
+                (
+                    "attachment",
+                    models.FileField(
+                        blank=True, null=True, upload_to="chat_attachments/"
+                    ),
+                ),
+                (
+                    "room",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="djangochatify_chat.chatroom",
+                    ),
+                ),
+                (
+                    "sender",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
         ),
         migrations.AddIndex(
-            model_name='message',
-            index=models.Index(fields=['timestamp'], name='djangochati_timesta_c47ca4_idx'),
+            model_name="message",
+            index=models.Index(
+                fields=["timestamp"], name="djangochati_timesta_c47ca4_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='message',
-            index=models.Index(fields=['room', 'timestamp'], name='djangochati_room_id_2cfdfb_idx'),
+            model_name="message",
+            index=models.Index(
+                fields=["room", "timestamp"], name="djangochati_room_id_2cfdfb_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='chatroom',
-            index=models.Index(fields=['created_at'], name='djangochati_created_0fbd76_idx'),
+            model_name="chatroom",
+            index=models.Index(
+                fields=["created_at"], name="djangochati_created_0fbd76_idx"
+            ),
         ),
         migrations.AddIndex(
-            model_name='chatroom',
-            index=models.Index(fields=['name'], name='djangochati_name_22e8d4_idx'),
+            model_name="chatroom",
+            index=models.Index(fields=["name"], name="djangochati_name_22e8d4_idx"),
         ),
     ]
