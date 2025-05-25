@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 import uuid
+from django.core.cache import cache
+from cacheops import cached_as
 
 class ChatRoom(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -22,16 +24,29 @@ class ChatRoom(models.Model):
     def __str__(self):
         return self.name
     
-    @property
-    def participant_count(self):
-        return self.participants.count()
+    def get_participant_count(self):
+        cache_key = f'room_participants_{self.id}'
+        count = cache.get(cache_key)
+        if count is None:
+            count = self.participants.count()
+            cache.set(cache_key, count, timeout=300)  # Cache for 5 minutes
+        return count
     
     def get_recent_messages(self, limit=50):
-        return self.message_set.order_by('-timestamp')[:limit]
+        cache_key = f'room_messages_{self.id}'
+        messages = cache.get(cache_key)
+        if messages is None:
+            messages = self.messages.order_by('-timestamp')[:limit]
+            cache.set(cache_key, messages, timeout=300)  # Cache for 5 minutes
+        return messages
     
     def mark_as_inactive(self):
         self.is_active = False
+        self.updated_at = timezone.now()
         self.save(update_fields=['is_active', 'updated_at'])
+        # Invalidate cache
+        cache.delete(f'room_messages_{self.id}')
+        cache.delete(f'room_participants_{self.id}')
 
 class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -73,3 +88,8 @@ class Message(models.Model):
     def is_modified(self):
         time_diff = self.updated_at - self.timestamp
         return time_diff.total_seconds() > 1  # If edited more than 1 second after creation
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        # Invalidate cache when new message is saved
+        cache.delete(f'room_messages_{self.room.id}')

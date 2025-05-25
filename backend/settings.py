@@ -5,6 +5,8 @@ import sys
 from datetime import timedelta
 import dj_database_url
 from django.core.exceptions import ImproperlyConfigured
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 
 # Load environment variables from .env file
@@ -38,6 +40,7 @@ INSTALLED_APPS = [
     'chat.apps.ChatConfig',  # Use the specific app config instead of just 'chat'
     'corsheaders',
     'rest_framework',  # Make sure this is included
+    'drf_spectacular',
 ]
 
 MIDDLEWARE = [
@@ -173,11 +176,64 @@ MESSAGE_BATCH_SIZE = 50
 
 # Add REST Framework settings
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-    ],
+}
+
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'DjangoChatify API',
+    'DESCRIPTION': 'A real-time chat application API',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+}
+
+# Sentry Configuration
+SENTRY_DSN = os.getenv('SENTRY_DSN')
+if SENTRY_DSN:
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        integrations=[DjangoIntegration()],
+        traces_sample_rate=1.0,
+        send_default_pii=True,
+    )
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'json': {
+            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
+            'format': '%(timestamp)s %(level)s %(name)s %(message)s',
+        },
+    },
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+            'formatter': 'json',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'INFO',
+    },
+}
+
+# Cacheops Configuration
+CACHEOPS_REDIS = {
+    'host': 'localhost',
+    'port': 6379,
+    'db': 1,
+}
+
+CACHEOPS = {
+    'chat.*': {'ops': 'all', 'timeout': 60*15},
+}
+
+CACHEOPS_DEFAULTS = {
+    'timeout': 60*60
 }
