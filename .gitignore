@@ -35,6 +35,7 @@ env/
 venv/
 ENV/
 djangochatifyenv/
+djangochatifyenv_py311
 
 # IDE
 .idea/

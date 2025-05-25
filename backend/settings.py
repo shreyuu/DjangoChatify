@@ -4,10 +4,8 @@ from datetime import timedelta
 from pathlib import Path
 
 import dj_database_url
-import sentry_sdk
 from django.core.exceptions import ImproperlyConfigured
 from dotenv import load_dotenv
-from sentry_sdk.integrations.django import DjangoIntegration
 
 # Load environment variables from .env file
 load_dotenv()
@@ -198,10 +196,12 @@ SPECTACULAR_SETTINGS = {
 }
 
 # Sentry Configuration
-SENTRY_DSN = os.getenv("SENTRY_DSN")
-if SENTRY_DSN:
+if not DEBUG and os.getenv("SENTRY_DSN"):
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+    
     sentry_sdk.init(
-        dsn=SENTRY_DSN,
+        dsn=os.getenv("SENTRY_DSN"),
         integrations=[DjangoIntegration()],
         traces_sample_rate=1.0,
         send_default_pii=True,
