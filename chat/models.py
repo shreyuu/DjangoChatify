@@ -1,9 +1,10 @@
-from django.db import models
-from django.contrib.auth.models import User
-from django.utils import timezone
 import uuid
-from django.core.cache import cache
+
 from cacheops import cached_as
+from django.contrib.auth.models import User
+from django.core.cache import cache
+from django.db import models
+from django.utils import timezone
 
 
 class ChatRoom(models.Model):

@@ -1,13 +1,15 @@
-import pytest
 import json
-from django.test import TestCase, Client
-from django.contrib.auth import get_user_model
-from django.urls import reverse
-from channels.testing import WebsocketCommunicator
-from channels.layers import get_channel_layer
+
+import pytest
 from channels.db import database_sync_to_async
-from .routing import application
+from channels.layers import get_channel_layer
+from channels.testing import WebsocketCommunicator
+from django.contrib.auth import get_user_model
+from django.test import Client, TestCase
+from django.urls import reverse
+
 from .models import ChatRoom, Message
+from .routing import application
 
 
 class HealthCheckTest(TestCase):

@@ -1,15 +1,16 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse
+from django.conf import settings
+from django.core.cache import cache
 from django.db import connections
 from django.db.utils import OperationalError
-from redis import Redis
-from django.conf import settings
-from rest_framework import viewsets, status
-from rest_framework.response import Response
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404, render
 from django_ratelimit.decorators import ratelimit
+from redis import Redis
+from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from rest_framework.response import Response
+
 from .models import ChatRoom, Message
-from django.core.cache import cache
 
 # Create your views here.
 

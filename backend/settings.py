@@ -1,13 +1,13 @@
 import os
-from pathlib import Path
-from dotenv import load_dotenv
 import sys
 from datetime import timedelta
-import dj_database_url
-from django.core.exceptions import ImproperlyConfigured
-import sentry_sdk
-from sentry_sdk.integrations.django import DjangoIntegration
+from pathlib import Path
 
+import dj_database_url
+import sentry_sdk
+from django.core.exceptions import ImproperlyConfigured
+from dotenv import load_dotenv
+from sentry_sdk.integrations.django import DjangoIntegration
 
 # Load environment variables from .env file
 load_dotenv()
