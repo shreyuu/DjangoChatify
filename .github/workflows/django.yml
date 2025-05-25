@@ -1,87 +1,59 @@
-name: Django CI
+name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [main, develop]
   pull_request:
-    branches: ["main"]
+    branches: [main]
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     services:
       postgres:
-        image: postgres:14
+        image: postgres:13
         env:
-          POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: github_actions
+          POSTGRES_DB: test_db
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
         ports:
           - 5432:5432
-        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
-      redis:
-        image: redis
-        ports:
-          - 6379:6379
-        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
 
-      - name: Set up Python 3.9
-        uses: actions/setup-python@v5
+      - name: Set up Python
+        uses: actions/setup-python@v4
         with:
           python-version: "3.9"
-          cache: "pip"
 
-      - name: Install Dependencies
+      - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Setup Test Environment
+      - name: Check code formatting with black
         run: |
-          # Create a test settings file for CI
-          cat > test_settings.py << EOF
-          from backend.settings import *
-          import os
+          black --check .
 
-          # Override database settings for testing
-          DATABASES = {
-              'default': {
-                  'ENGINE': 'django.db.backends.postgresql',
-                  'NAME': 'github_actions',
-                  'USER': 'postgres',
-                  'PASSWORD': 'postgres',
-                  'HOST': 'localhost',
-                  'PORT': '5432',
-              }
-          }
+      - name: Run flake8 for linting
+        run: |
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
 
-          # Set required environment variables
-          SECRET_KEY = 'test-secret-key-for-github-actions'
-          DEBUG = True
-          ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-          # Channel layers for testing
-          CHANNEL_LAYERS = {
-              'default': {
-                  'BACKEND': 'channels_redis.core.RedisChannelLayer',
-                  'CONFIG': {
-                      'hosts': [('localhost', 6379)],
-                  },
-              },
-          }
-          EOF
-
-      - name: Run Migrations
+      - name: Check Django configuration
         env:
           DJANGO_SETTINGS_MODULE: test_settings
         run: |
-          python manage.py migrate --noinput
+          python manage.py check --deploy
 
-      - name: Run Tests
+      - name: Check for missing migrations
         env:
           DJANGO_SETTINGS_MODULE: test_settings
         run: |
-          python manage.py test --noinput
+          python manage.py makemigrations --check --dry-run

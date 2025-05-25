@@ -46,6 +46,11 @@ class ChatRoom(models.Model):
         cache.delete(f"room_messages_{self.id}")
         cache.delete(f"room_participants_{self.id}")
 
+    @property
+    def participant_count(self):
+        """Property to get participant count for easier access in tests"""
+        return self.get_participant_count()
+
 
 class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
