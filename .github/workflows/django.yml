@@ -15,7 +15,7 @@ jobs:
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: github-actions
+          POSTGRES_DB: github_actions
         ports:
           - 5432:5432
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
@@ -39,21 +39,49 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Setup Test Environment
+        run: |
+          # Create a test settings file for CI
+          cat > test_settings.py << EOF
+          from backend.settings import *
+          import os
+
+          # Override database settings for testing
+          DATABASES = {
+              'default': {
+                  'ENGINE': 'django.db.backends.postgresql',
+                  'NAME': 'github_actions',
+                  'USER': 'postgres',
+                  'PASSWORD': 'postgres',
+                  'HOST': 'localhost',
+                  'PORT': '5432',
+              }
+          }
+
+          # Set required environment variables
+          SECRET_KEY = 'test-secret-key-for-github-actions'
+          DEBUG = True
+          ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+
+          # Channel layers for testing
+          CHANNEL_LAYERS = {
+              'default': {
+                  'BACKEND': 'channels_redis.core.RedisChannelLayer',
+                  'CONFIG': {
+                      'hosts': [('localhost', 6379)],
+                  },
+              },
+          }
+          EOF
+
       - name: Run Migrations
         env:
-          DJANGO_SETTINGS_MODULE: backend.settings
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/github-actions
-          REDIS_URL: redis://localhost:6379/0
-          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_SETTINGS_MODULE: test_settings
         run: |
-          python manage.py makemigrations
-          python manage.py migrate
+          python manage.py migrate --noinput
 
       - name: Run Tests
         env:
-          DJANGO_SETTINGS_MODULE: backend.settings
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/github-actions
-          REDIS_URL: redis://localhost:6379/0
-          SECRET_KEY: ${{ secrets.DJANGO_SECRET_KEY }}
+          DJANGO_SETTINGS_MODULE: test_settings
         run: |
-          python manage.py test
+          python manage.py test --noinput
