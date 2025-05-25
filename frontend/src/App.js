@@ -1,12 +1,30 @@
 import React from "react";
+import { Toaster } from "react-hot-toast";
+import { Provider } from "react-redux";
+import store from "./store";
+import Router from "./Router";
 
 function App() {
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <h1 className="text-3xl font-bold text-blue-600">
-        DjangoChatify Frontend
-      </h1>
-    </div>
+    <Provider store={store}>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          duration: 4000,
+          style: {
+            background: "#363636",
+            color: "#fff",
+          },
+          success: {
+            duration: 3000,
+            theme: {
+              primary: "#4aed88",
+            },
+          },
+        }}
+      />
+      <Router />
+    </Provider>
   );
 }
 

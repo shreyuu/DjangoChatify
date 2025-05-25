@@ -8,11 +8,15 @@
 
 ## Features
 
-- 🔄 **Real-Time Messaging**: Powered by WebSockets.
-- 📦 **Scalable Backend**: Built with Django Channels.
+- 🔄 **Real-Time Messaging**: Powered by WebSockets via Django Channels.
+- 📦 **Scalable Backend**: Built with Django, with Gunicorn for production.
 - 💅 **Responsive Design**: Styled using Tailwind CSS.
-- 🗂️ **MongoDB Database**: For efficient message storage.
+- 🗂️ **PostgreSQL Database**: For primary data storage with optimized models.
 - 💻 **Cross-Platform**: Supports macOS and Windows.
+- 🐳 **Dockerized**: Complete Docker setup for easy development and deployment.
+- 🔒 **Security**: Production-ready with non-root user container setup.
+- 🧪 **Comprehensive Tests**: Includes unit and WebSocket tests.
+- 🚀 **CI/CD**: GitHub Actions workflow with code quality checks.
 
 ---
 
@@ -20,7 +24,8 @@
 
 - **Frontend**: React.js, Tailwind CSS
 - **Backend**: Django, Django Channels, WebSockets
-- **Database**: MongoDB
+- **Database**: PostgreSQL, Redis (for WebSocket channels)
+- **Deployment**: Docker, Docker Compose, Gunicorn
 
 ---
 
@@ -28,148 +33,135 @@
 
 - Python (3.9+)
 - Node.js (16+)
-- MongoDB (local or cloud)
+- Docker and Docker Compose (for containerized setup)
 - VS Code or your preferred code editor
-- Redis (for WebSocket channel layers)
 - **macOS** or **Windows**
 
 ---
 
 ## Setup Instructions
 
-### Clone the Repository
+### Using Docker (Recommended)
 
-```bash
-git clone https://github.com/shreyuu/djangochatify.git
-cd djangochatify
-```
+1. **Clone the Repository**:
 
-### Backend Setup (Django)
+   ```bash
+   git clone https://github.com/shreyuu/djangochatify.git
+   cd djangochatify
+   ```
 
-### macOS
+2. **Create Environment File**:
 
-1. **Set up a virtual environment**:
+   Create a `.env` file in the project root based on the `.env.example` template.
 
-    ```bash
-    python3 -m venv env
-    source env/bin/activate
-    ```
+3. **Build and Run with Docker Compose**:
 
-2. **Install dependencies**:
+   ```bash
+   docker-compose up --build
+   ```
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+4. **Access the Application**:
+   - Backend: http://localhost:8000
+   - Frontend: http://localhost:3000
 
-3. **Run the MongoDB service**:
-    - Ensure MongoDB is running locally or use a cloud-based service like MongoDB Atlas.
+### Manual Setup
 
-4. **Set up Redis**:
-    - Install Redis via Homebrew:
-
-        ```bash
-        brew install redis
-        brew services start redis
-        ```
-
-5. **Run database migrations**:
-
-    ```bash
-    python manage.py migrate
-    ```
-
-6. **Start the Django server**:
-
-    ```bash
-    python manage.py runserver
-    ```
-
-### Windows
+#### Backend Setup (Django)
 
 1. **Set up a virtual environment**:
 
-    ```bash
-    python -m venv env
-    env\Scripts\activate
-    ```
+   ```bash
+   python -m venv djangochatifyenv
+   source djangochatifyenv/bin/activate  # On Windows: djangochatifyenv\Scripts\activate
+   ```
 
 2. **Install dependencies**:
 
-    ```bash
-    pip install -r requirements.txt
-    ```
+   ```bash
+   pip install -r requirements.txt
+   ```
 
-3. **Run the MongoDB service**:
-    - Ensure MongoDB is running locally or use a cloud-based service like MongoDB Atlas.
-4. **Set up Redis**:
-    - Download Redis for Windows from Microsoft’s GitHub repository.
-    - Start the Redis server:
+3. **Set up PostgreSQL and Redis**:
 
-        ```bash
-        redis-server
-        ```
+   - Ensure both services are running
+   - Create a database named `djangochatify_db`
+
+4. **Create a .env file**:
+
+   - Use the `.env.example` as a template
 
 5. **Run database migrations**:
 
-    ```bash
-    python manage.py migrate
-    ```
+   ```bash
+   python manage.py migrate
+   ```
 
 6. **Start the Django server**:
 
-    ```bash
-    python manage.py runserver
-    ```
+   ```bash
+   python manage.py runserver
+   ```
 
-### Frontend Setup (React.js)
-
-macOS & Windows
+#### Frontend Setup (React.js)
 
 1. **Navigate to the frontend directory**:
 
-    ```bash
-    cd frontend
-    ```
+   ```bash
+   cd frontend
+   ```
 
 2. **Install dependencies**:
 
-    ```bash
-    npm install
-    ```
+   ```bash
+   npm install
+   ```
 
 3. **Start the React development server**:
 
-    ```bash
-    npm start
-    ```
+   ```bash
+   npm start
+   ```
 
-## Running the Application
+## Running Tests
 
-1. Open the Django backend at <http://127.0.0.1:8000/>.
-2. Access the React frontend at <http://localhost:3000/>.
-3. Chat in real-time by joining a room!
+```bash
+# Run all tests
+pytest
 
-## Folder Structure
+# Run specific tests
+pytest chat/tests.py
 
-```plaintext
-DjangoChatify/
-├── backend/ (Django project)
-│   ├── chat/ (Django app)
-│   ├── realtime_chat/ (Django settings)
-│   └── manage.py
-├── frontend/ (React project)
-│   ├── src/
-│   ├── public/
-│   └── package.json
-├── requirements.txt
-└── README.md
+# Run with verbose output
+pytest -v
 ```
 
-## Troubleshooting
+## Health Check Endpoint
 
-- **MongoDB Connection**: Ensure MongoDB is running, and the connection URI in settings.py is correct.
-- **Redis Not Found**: Check if Redis is installed and running.
-- **CORS Errors**: Add the frontend URL to Django’s CORS_ALLOWED_ORIGINS.
+The application includes a health check endpoint at `/health/` that monitors:
+
+- Database connectivity
+- Redis connectivity
+
+## Production Deployment
+
+For production deployment:
+
+1. **Build the Docker images**:
+
+   ```bash
+   docker-compose build
+   ```
+
+2. **Deploy with proper environment variables**:
+
+   - Set `DEBUG=False` in your production `.env` file
+   - Set proper `ALLOWED_HOSTS` for your domain
+   - Use a strong `SECRET_KEY`
+
+3. **Run with**:
+   ```bash
+   docker-compose up -d
+   ```
 
 ## License
 
