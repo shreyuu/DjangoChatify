@@ -29,13 +29,17 @@ media/
 staticfiles/
 
 # Virtual Environment
-.env
+.env*
 .venv
 env/
 venv/
 ENV/
 djangochatifyenv/
 djangochatifyenv_py311
+
+# Secrets and configuration
+.secrets.*
+.actrc
 
 # IDE
 .idea/
