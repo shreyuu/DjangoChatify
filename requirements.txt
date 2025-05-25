@@ -69,3 +69,5 @@ django-cacheops==7.0.2
 
 # Code Quality
 mypy==1.9.0
+black>=23.0.0
+flake8>=6.0.0
