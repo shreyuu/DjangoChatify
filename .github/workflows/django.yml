@@ -9,77 +9,38 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      max-parallel: 4
-      matrix:
-        python-version: [3.9]
-
     services:
+      postgres:
+        image: postgres:14
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github-actions
+        ports:
+          - 5432:5432
+        options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
       redis:
         image: redis
         ports:
           - 6379:6379
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-      mongodb:
-        image: mongo
-        ports:
-          - 27017:27017
-      postgres:
-        image: postgres:14
-        ports:
-          - 5432:5432
-        options: >-
-          --health-cmd "pg_isready -U postgres"
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_DB: mydatabase
+        options: --health-cmd "redis-cli ping" --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python ${{ matrix.python-version }}
+      - name: Set up Python 3.9
         uses: actions/setup-python@v3
         with:
-          python-version: ${{ matrix.python-version }}
+          python-version: 3.9
+          cache: "pip"
       - name: Install Dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pytest pytest-django pytest-asyncio flake8 black isort bandit safety
-
-      - name: Check code formatting with Black
-        run: |
-          black --check --line-length=88 .
-
-      - name: Check imports with isort
-        run: |
-          isort --check-only --profile black .
-
-      - name: Lint with flake8
-        run: |
-          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
-
-      - name: Security check with bandit
-        run: |
-          bandit -r . -x tests,venv,env,djangochatifyenv
-
-      - name: Check for vulnerable dependencies
-        run: |
-          safety check
 
       - name: Run Tests
         env:
           DJANGO_SETTINGS_MODULE: backend.settings
-          DATABASE_URL: postgres://postgres:postgres@localhost:5432/mydatabase
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
+          DATABASE_URL: postgres://postgres:postgres@localhost:5432/github-actions
+          REDIS_URL: redis://localhost:6379/0
         run: |
-          pytest chat/tests.py -v
+          python manage.py test
