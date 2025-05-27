@@ -18,10 +18,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_add(self.room_group_name, self.channel_name)
         await self.accept()
 
-        print(
-            f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] New connection in room: {self.room_name}"
-        )
-
     async def disconnect(self, close_code):
         if hasattr(self, "username"):
             # Remove user from connected users
@@ -43,9 +39,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # Leave room group
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-        print(
-            f"\n[{datetime.now().strftime('%Y-%m-%d %H:%M:%S')}] Connection closed in room: {self.room_name}"
-        )
 
     async def receive(self, text_data):
         try:
@@ -77,14 +70,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                     return
 
             # Handle regular chat messages
-            print("\n=== Message Received From Client ===")
-            print(f"Timestamp: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-            print(f"Room: {self.room_name}")
-            print(f"From User: {message_data.get('username', 'Anonymous')}")
-            print(f"Message: {message_data.get('message', '')}")
-            print("Broadcasting to group members...")
-            print("========================\n")
-
             await self.channel_layer.group_send(
                 self.room_group_name,
                 {
